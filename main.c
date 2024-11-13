@@ -4,9 +4,9 @@
 #include <time.h>
 #define rows 20
 #define columns 20
+#define Initial_length 2
+#define number_of_food 2
 char board[columns*rows];
-int snakeX;
-int snakeY;
 int game_over=0;
 typedef struct{
     int x,y;
@@ -65,10 +65,14 @@ void draw_snake(){
         else  board[snake.part[i].x*columns+snake.part[i].y]='*';
     }
 }
+
 void move_snake(int deltaX,int deltaY){
     int i;
     snake.part[0].x+=deltaX;
     snake.part[0].y+=deltaY;
+    for(i=1;i<snake.length;i++){
+        if(snake.part[0].x==snake.part[i].x&&snake.part[0].y==snake.part[i].y) game_over=1;
+    }
     for(i=snake.length-1;i>=1;i--){
         snake.part[i].x=snake.part[i-1].x;
         snake.part[i].y=snake.part[i-1].y;
@@ -100,11 +104,13 @@ void read_keyboard(){
 
 }
 void setup_game(){
-    snake.length=1;
-    foods.number=2;
+    snake.length=Initial_length;
+    foods.number=number_of_food;
     srand(time(NULL));
     snake.part[0].x=(rand()%(rows-4))+1;
     snake.part[0].y=(rand()%(columns-4))+1;
+    
+
     int i;
     for(i=0;i<foods.number;i++){
         foods.food[i].x=(rand()%(rows-2))+1;
@@ -118,7 +124,7 @@ int main(){
         draw_snake();
         draw_food();
         print_board();
-        printf("votre score est : %i \n",snake.length*10);
+        printf("Votre score est : %i \n",(snake.length-1)*10);
         read_keyboard();
     }
     
