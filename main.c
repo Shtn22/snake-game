@@ -69,7 +69,7 @@ void move_snake(int deltaX,int deltaY){
     int i;
     snake.part[0].x+=deltaX;
     snake.part[0].y+=deltaY;
-    for(i=snake.length;i>=1;i--){
+    for(i=snake.length-1;i>=1;i--){
         snake.part[i].x=snake.part[i-1].x;
         snake.part[i].y=snake.part[i-1].y;
     }
