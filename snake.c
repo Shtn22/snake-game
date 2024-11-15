@@ -1,8 +1,8 @@
 #include<stdlib.h>
+#include <windows.h>
 #include <stdio.h>
 #include<conio.h>
 #include <time.h>
-#include<ncurses/ncurses.h>
 #define rows 20
 #define columns 20
 #define Initial_length 2
@@ -24,6 +24,22 @@ typedef struct{
     int number;
     Food food[2]; 
 }Foods;
+char get_char_with_timeout(double timeout_in_seconds){
+    clock_t start_time=clock();
+    static int k=0;
+    if (k==0){k++;return _getch();}
+    else {
+        while((clock()-start_time)<timeout_in_seconds*CLOCKS_PER_SEC){
+        if(_kbhit()){
+            return _getch();
+        }
+        Sleep(10);}
+    return '\0';
+
+    }
+    
+    
+}
 
 void fill_board(){
     int x,y;
@@ -38,8 +54,7 @@ void fill_board(){
     }
             }
 void print_board(){
-    refresh();
-    noecho();
+    system("cls");
     int x,y;
     for (x=0;x<rows;x++){
         for(y=0;y<columns;y++){
@@ -97,14 +112,15 @@ void move_snake(int deltaX,int deltaY){
 void read_keyboard(){
     static int deltaX=0,deltaY=0;
     char ch;
-    ch=getch();
-    switch(ch){
+    ch=get_char_with_timeout(0.2);
+    if (ch!='\0'){
+        switch(ch){
         case 'z':deltaX=-1;deltaY=0;;break;
         case 's':deltaX=1;deltaY=0;break;
         case 'd':deltaX=0;deltaY=1;break;
         case 'q':deltaX=0;deltaY=-1;break;
 
-    }
+    }}
     move_snake(deltaX,deltaY);
 
 }
@@ -123,22 +139,15 @@ void setup_game(){
     }
 }        
 int main(){
-    initscr();
-    noecho();
-    timeout(100);
     setup_game();
-
     while(!game_over){
-        move(0,0);
         fill_board();
         draw_snake();
         draw_food();
         print_board();
-        move(rows+1,0);
-        printw("Votre score est : %i \n",(snake.length-1)*10);
+        printf("Votre score est : %i \n",(snake.length-1)*10);
         read_keyboard();
     }
-    endwin();
     
 
 
