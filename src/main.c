@@ -115,6 +115,7 @@ void read_keyboard(){
     ch=get_char_with_timeout(0.2);
     if (ch!='\0'){
         switch(ch){
+        case 75:
         case 'z':deltaX=-1;deltaY=0;;break;
         case 's':deltaX=1;deltaY=0;break;
         case 'd':deltaX=0;deltaY=1;break;
