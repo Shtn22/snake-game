@@ -148,6 +148,7 @@ int main(){
         printf("Votre score est : %i \n",(snake.length-1)*10);
         read_keyboard();
     }
+    printf("votre score finale est : %i\n",(snake.length-1)*10);
     
 
 
