@@ -119,7 +119,7 @@ void read_keyboard(){
         case 'z':deltaX=-1;deltaY=0;;break;
         case 's':deltaX=1;deltaY=0;break;
         case 'd':deltaX=0;deltaY=1;break;
-        case 'q':deltaX=0;deltaY=-1;break;
+        case 'q':deltaX=0;deltaY=-1;break;//ayoub
 
     }}
     move_snake(deltaX,deltaY);
