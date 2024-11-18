@@ -22,18 +22,18 @@ typedef struct {
 
 typedef struct {
     int x, y;
-} Food;
+} coordinates;
 
 typedef struct {
     int number;
-    Food food[number_of_food];
-} Foods;
+    coordinates f[number_of_food];
+} Food;
 
 
 char board[columns * rows];
 int game_over = 0;
 Snake snake;
-Foods foods;
+Food foods;
 
 
 char get_char_with_timeout(double timeout_in_seconds);
@@ -113,7 +113,7 @@ void draw_snake() {
 
 void draw_food() {
     for (int i = 0; i < foods.number; i++) {
-        board[foods.food[i].x * columns + foods.food[i].y] = '+';
+        board[foods.f[i].x * columns + foods.f[i].y] = '+';
     }
 }
 
@@ -163,9 +163,9 @@ void move_snake(int deltaX, int deltaY) {
     add_snake_node(newX, newY);
     int ate_food = 0;
     for (int i = 0; i < foods.number; i++) {
-        if (foods.food[i].x == newX && foods.food[i].y == newY) {
-            foods.food[i].x = (rand() % (rows - 2)) + 1;
-            foods.food[i].y = (rand() % (columns - 2)) + 1;
+        if (foods.f[i].x == newX && foods.f[i].y == newY) {
+            foods.f[i].x = (rand() % (rows - 2)) + 1;
+            foods.f[i].y = (rand() % (columns - 2)) + 1;
             ate_food = 1;
             break;
         }
@@ -221,8 +221,8 @@ void setup_game() {
     foods.number = number_of_food;
     srand(time(NULL));
     for (int i = 0; i < foods.number; i++) {
-        foods.food[i].x = (rand() % (rows - 2)) + 1;
-        foods.food[i].y = (rand() % (columns - 2)) + 1;
+        foods.f[i].x = (rand() % (rows - 2)) + 1;
+        foods.f[i].y = (rand() % (columns - 2)) + 1;
     }
 }
 
