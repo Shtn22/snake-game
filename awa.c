@@ -7,6 +7,12 @@
 #define rows 20
 #define columns 20
 #define number_of_food 2
+#define MAX_STACK_SIZE 1000
+
+typedef struct {
+    int Scores[MAX_STACK_SIZE];
+    int nb_values;
+}stack;
 
 typedef struct SnakeNode {
     int x, y;
@@ -29,13 +35,21 @@ typedef struct {
     coordinates f[number_of_food];
 } Food;
 
-
+char name[25];
 char board[columns * rows];
 int game_over = 0;
 Snake snake;
 Food foods;
 
-
+int heighest_score(stack*s);
+int previous_score(stack *s);
+void file_save(stack*s,char* player_name);
+int stack_is_empty(stack*s);
+int stack_size(stack *s);
+int stack_pop(stack*s);
+stack *stack_new();
+void stack_free(stack*s);
+int stack_push(stack* s, int p);
 char get_char_with_timeout(double timeout_in_seconds);
 void fill_board();
 void print_board();
@@ -51,19 +65,84 @@ void free_snake();
 
 int main() {
     setup_game();
+    stack *s=stack_new();
     while (!game_over) {
         fill_board();
         draw_snake();
         draw_food();
         print_board();    
-        printf("Score: %d\n", (snake.length) * 10);
+        int score=(snake.length)*10;
+        stack_push(s,score);
+        file_save(s,name);
+        printf("Score: %d\n", score);
+        previous_score(s);
+        heighest_score(s);
         read_keyboard();
     }
     fill_board();    
     print_board();
     printf("LOSER HAHAHAHA! Final Score: %d\n", (snake.length) * 10);
+    printf("%d\n",previous_score(s));
+    printf("%d\n",heighest_score(s));
     free_snake();
+    stack_free(s);
     return 0;
+}
+
+stack* stack_new(void){
+    stack* s;
+    s=malloc(sizeof(stack));
+    if(!s) return NULL;
+    s->nb_values=0;
+    return s;
+
+}
+
+void stack_free(stack*s){
+    free(s);
+}
+
+int stack_push(stack* s, int p){
+    if (stack_size(s)>=MAX_STACK_SIZE) return -1;
+    s->Scores[s->nb_values++]=p;return 0;
+}
+int stack_pop(stack*s){
+    if (!(s->nb_values)) return -1;
+    return s->Scores[--(s->nb_values)]; 
+
+}
+int stack_size(stack *s){
+    return s->nb_values;
+}
+int stack_is_empty(stack*s){
+    return s->nb_values==0;
+}
+
+void file_save(stack*s,char* player_name){
+FILE* file=fopen("scores.txt","a");
+if (file==NULL) printf("unable to open file!\n");
+for(int i=0;i<s->nb_values;i++){
+    fprintf(file,"%d %s\n",s->Scores[i],player_name);
+}
+fclose(file);
+}
+
+int previous_score(stack *s){
+    if (stack_is_empty(s)) printf("there is no previous score!\n");
+    else printf("previous score: %d",s->Scores[s->nb_values-1]);
+}
+
+int heighest_score(stack*s){
+    if (stack_is_empty(s)) printf("there is no heighest score yet!\n");
+    else {
+    int h_s = s->Scores[0];
+    for (int i = 1; i < s->nb_values; i++) {
+        if (s->Scores[i] > h_s) {
+            h_s = s->Scores[i];
+        }
+    }
+        printf("heighest score: %d\n",h_s);
+    }   
 }
 
 
@@ -79,7 +158,6 @@ void fill_board() {
         }
     }
 }
-
 
 void print_board() {
     system("cls");
@@ -213,6 +291,9 @@ void read_keyboard() {
 }
 
 void setup_game() {
+    printf("Enter player name!\n");
+    fgets(name,sizeof(name),stdin);
+    name [strcspn(name,"\n")]='\0';
     snake.head = NULL;
     snake.tail = NULL;
     snake.length = 0;
@@ -225,8 +306,6 @@ void setup_game() {
         foods.f[i].y = (rand() % (columns - 2)) + 1;
     }
 }
-
-
 
 void free_snake() {
     while (snake.head != NULL) {
