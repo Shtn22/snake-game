@@ -10,6 +10,7 @@
 char board[columns*rows];
 int game_over=0;
 int number_of_files=0;
+int still_playing=1;
 char H='@';
 typedef struct{
     int x,y;
@@ -155,7 +156,13 @@ void move_snake(Snake *snake,int deltaX,int deltaY){
         }
     }
 }    
-    
+void update_saved_game(int x){
+    FILE *file;
+    file=fopen("saved_game.txt","w");
+    fprintf(file,"%i",x);
+    fclose(file);
+
+}  
 
 Snake* setup_game(){
     
@@ -181,7 +188,8 @@ void save_game(Snake *snake){
         fprintf(file,"%i %i\n",current->x,current->y);
         current=current->next;
     }
-    fclose(file);}
+    fclose(file);
+    update_saved_game(1);}
 
 Snake* setup_saved_game(){
     food.number=number_of_food;
@@ -198,6 +206,7 @@ Snake* setup_saved_game(){
     while(fgets(line,sizeof(line),file)){
         sscanf(line,"%i %i ",&a,&b);
         add_to_the_tail(snake,a,b);}
+    update_saved_game(0);
     return snake;}
 void check_for_best_score(Snake *snake){
     FILE *file;
@@ -238,6 +247,7 @@ void read_keyboard(Snake *snake){
     ch=get_char_with_timeout(0.2,snake);
     if (ch!='\0'&&ch!=prev){
         switch(ch){
+        
         case 'a':save_game(snake);game_over=1;break;
         case 'z':deltaX=-1;deltaY=0;H='^';break;
         case 's':deltaX=1;deltaY=0;H='v';break;
@@ -249,21 +259,28 @@ void read_keyboard(Snake *snake){
     move_snake(snake,deltaX,deltaY);
 
 }
-
-
-
-
-   
+int check_for_saved_game(){
+    FILE *file;
+    file=fopen("saved_game.txt","r");
+    char line[10];
+    fgets(line,sizeof(line),file);
+    fclose(file);
+    int saved_game;
+    sscanf(line,"%i",&saved_game);
+    return saved_game;}
 int main(){
+    while(still_playing){
     int best_score=get_max_score();
-
     printf("               Meilleur Score : %i               \n",best_score);
     printf("               1-Continuer la Partie                        \n");
     printf("               2-Nouvelle Partie                            \n");
+    printf("               3-Quitter le jeu                              \n");
     char ch;
     ch=_getch();
+    if(ch=='3'){still_playing=0;}
     if(ch=='2'){
     Snake *snake=setup_game();
+    game_over=0;
     while(!game_over){
         fill_board();
         draw_snake(snake);
@@ -277,10 +294,13 @@ int main(){
     print_board();
     printf("votre score finale est : %i\n",(snake->length-1)*10);
     check_for_best_score(snake);
-    free_snake(snake);}
+    free_snake(snake);
+    system("cls");}
     
     if(ch=='1'){
+        if(check_for_saved_game()){
         Snake *snake=setup_saved_game();
+        game_over=0;
         while(!game_over){
             fill_board();
             draw_snake(snake);
@@ -294,6 +314,7 @@ int main(){
         print_board();
         printf("votre score finale est : %i\n",(snake->length-1)*10);
         check_for_best_score(snake);
-        free_snake(snake);}
+        free_snake(snake);
+        system("cls");}}}
     return 0;}
 
